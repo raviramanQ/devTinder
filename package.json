@@ -4,7 +4,8 @@
   "description": "tinder for developers",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon src/app.js",
+   "dev": "nodemon src/app.js"
   },
   "keywords": [
     "javascript",
@@ -14,6 +15,7 @@
   "author": "\"Ravi Raman\"",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "nodemon": "^3.1.9"
   }
 }
