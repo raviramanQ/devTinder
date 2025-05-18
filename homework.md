@@ -11,3 +11,7 @@
 - difference between caret and tilda (^ and ~)
 - what are dependencies
 - what is "-g" while installing npm install 
+- play with routes and route extention. ex /hello, /hello/2
+- order of routes matter alot
+- write logic to handle http request like get,post,delete,patch api calls
+- explore routing and use of ?, +, (), * in the routes
