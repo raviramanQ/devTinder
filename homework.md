@@ -15,3 +15,10 @@
 - order of routes matter alot
 - write logic to handle http request like get,post,delete,patch api calls
 - explore routing and use of ?, +, (), * in the routes
+- Reading the dynamic routes
+- Use of regex in routes /a/ , /.*fly$/
+
+- Multiple Route Handlers - Play with the code
+- next()
+- next function and error along with res.send()
+- app.use("/route",rH1,rH2,[rH3,rH4],rH5);
