@@ -1,124 +1,138 @@
-const express = require("express")
-const {adminAuth,userLoginAuth} = require("./middlewares/auth");
-
+const express = require("express");
+const connectDB = require("./config/database");
 const app = express();
+const User = require("./models/user")
+
+app.use(express.json());
 
 
-// app.use("/admin",adminAuth);
-// app.get("/admin/getAllData",adminAuth,(req,res)=>{
-//     console.log('come4');
-//     res.status(200).send("success4");
-// })
 
-// user login auth 
 
-// app.get("/login/getdetails",userLoginAuth,(req,res)=>{
-//     res.status(200).send("login successfully");
-// })
-app.use("/error",(req,res,next)=>{
-    console.log('ppsssss');
-    
-    // if(err){
-    //     res.status(500).send("something went wrong");
-    // }
+app.post("/signup",async (req,res) => {
+    // creating a new instance of the user model
+
+    const user = new User(req.body);
+
+    try{
+    await user.save();
+    res.send("user added successfully")
+    }catch (err) {
+        res.status(400).send("Error saving the user:" + err.message);
+    }
 });
-app.get("/error/handling",(req,res)=>{
-    console.log('ppp');
-    
-    throw new Error("errroooorrrooor");
 
-    res.send("user data send");
+
+app.post("/user",async (req,res)=>{
+console.log('ooo',req.body);
+
+    // fetch user on the basis of email
+    try{
+         const user = await User.find({emailId: req.body.emailId});
+
+         res.status(200).send(user);
+
+    }catch (err) {
+        res.status(400).send("error"+ err.message);
+    }
+    
+});
+
+
+app.get("/feed",async (req,res)=>{
+
+    try{
+        const users = await User.find();
+        res.send(users);
+    }
+    catch (err) {
+        res.status(400).send("issue");
+    }
+
+
+
+});
+
+app.post("/findOneUser",async (req,res)=>{
+
+    try{
+        const userOne = await User.findOne({emailId: req.body.emailId}).sort({age:1});
+
+        res.send(userOne);
+    }
+    catch (err) {
+        res.status(400).send("issue");
+
+    }
+});
+
+
+app.delete("/deleteUser", async(req,res)=>{
+    try{
+        const deleteUser = await User.findOneAndDelete({_id : req.body.userId});
+
+        res.send(deleteUser);
+    }
+    catch (err){
+        res.status(400).send("error");
+    }
 })
 
-// app.use("/",(req,res)=>{
+app.patch("/updateUserDetail", async(req,res)=>{
 
-//     console.log(req.params);
-//     // res.send({
-//     //     name:"Ram",
-//     //     age:"Infinite"
-//     // });
-// })
+    const id = req.body._id;
+    
+    const data = req.body;
 
-// app.get("/data",(req,res)=>{
+    try{
+        const updateUser = await User.findByIdAndUpdate({_id:id},data, {
+        returnDocument:"after",
+        });
 
-//     console.log(req.params);
-//     res.send({
-//         name:"ravi",
-//         age:"28"
-//     });
-// })
+        res.status(200).send("data updated successfully"+updateUser);
+    }
+    catch (err){
+        res.status(400).send("error");
 
 
-app.listen(3000, ()=>{
-    console.log('congratulation my server is running')
+    }
+})
+
+app.put("/updateUserDetailPut", async(req,res)=>{
+
+    const id = req.body._id;
+    
+    const data = req.body;
+
+    try{
+        const updateUser = await User.replaceOne({_id:id},data, {
+        returnDocument:"after",
+        });
+
+        res.status(200).send("data updated successfully"+updateUser);
+    }
+    catch (err){
+        res.status(400).send("error");
+
+
+    }
+})
+
+
+
+
+
+
+
+
+
+connectDB().then(()=>{
+    console.log("DB connected");
+    app.listen(3000, ()=>{
+        console.log('congratulation my server is running')
+    });
+}).catch(err=>{
+    console.error("Database cannot be established");
 });
 
 
-// till here we have created a server and our server is listening at port 3000.
 
-
-
-
-// app.use("/car",(req,res)=>{   // request  handler
-//     res.send("this is mercedes car page siayram");
-// });
-// app.use("/",(req,res)=>{
-//     res.send("this is main");
-// });
-
-// # dynamic route req.params
-// app.get("/data/:dataId/:makeId",(req,res)=>{
-
-//     console.log(req.params);
-//     res.send({
-//         name:"ravi",
-//         age:"28"
-//     });
-// })
-
-// app.use("/",(req,res)=>{
-
-//     console.log(req.params);
-//     res.send({
-//         name:"Ram",
-//         age:"Infinite"
-//     });
-// })
-
-// app.get("/data",(req,res)=>{
-
-//     console.log(req.params);
-//     res.send({
-//         name:"ravi",
-//         age:"28"
-//     });
-// })
-
-
-
-// app.post("/data",(req,res,next)=>{
-//     res.send("post request3");
-//     next();
-// },(req,res)=>{
-//    res.send("post response 2");
-// })
-
-
-// admin auth
-
-// app.use("/admin",(req,res,next)=>{
-//     const token = "Manshi@123";
-//     console.log('come1');
-//     const isValidAuth = token == "Manshi@123";
-
-//     if(!isValidAuth)
-//     {
-//         res.status(401).send("Unauthorized User");
-    
-//     }
-//     else{
-//         console.log('ooo');
-        
-//         next();
-//     }
-// });
