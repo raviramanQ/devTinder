@@ -8,6 +8,7 @@ app.use(express.json());
 
 
 
+
 app.post("/signup",async (req,res) => {
     // creating a new instance of the user model
 
@@ -77,16 +78,42 @@ app.delete("/deleteUser", async(req,res)=>{
     }
 })
 
-app.patch("/updateUserDetail", async(req,res)=>{
+app.patch("/updateUserDetail/:_id", async(req,res)=>{
 
-    const id = req.body._id;
+    const id = req.params?._id;
     
     const data = req.body;
 
     try{
+
+        const ALLOWED_UPDATES  = ["_id","photoUrl","about","age","emailId","skills","gender"];
+
+        const isUpdateAllowed = Object.keys(data).every((k) => 
+            ALLOWED_UPDATES.includes(k)
+        
+        );
+
+       if(!isUpdateAllowed){
+
+           throw new Error("Update not allowed");
+       }
+       console.log(typeof data?.skills);
+  
+console.log( data?.skills.length);
+
+       if(data?.skills.length > 5)
+       {
+        console.log('-----');
+        
+        throw new Error("limit exceeds for skills");
+
+       }
+
+// return;
+
         const updateUser = await User.findByIdAndUpdate({_id:id},data, {
         returnDocument:"after",
-        runValidators:true
+        runValidators:true,
 
         });
 
