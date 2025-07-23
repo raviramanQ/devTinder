@@ -5,10 +5,6 @@ const User = require("./models/user")
 
 app.use(express.json());
 
-
-
-
-
 app.post("/signup",async (req,res) => {
     // creating a new instance of the user model
 
@@ -99,7 +95,7 @@ app.patch("/updateUserDetail/:_id", async(req,res)=>{
        }
        console.log(typeof data?.skills);
   
-console.log( data?.skills.length);
+    console.log( data?.skills.length);
 
        if(data?.skills.length > 5)
        {
@@ -145,13 +141,6 @@ app.put("/updateUserDetailPut", async(req,res)=>{
 
     }
 })
-
-
-
-
-
-
-
 
 
 connectDB().then(()=>{

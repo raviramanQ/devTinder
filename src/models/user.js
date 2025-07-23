@@ -26,7 +26,14 @@ const userSchema = new mongoose.Schema({
         },
     },
     password: {
-        type: String
+        type: String,
+        validate(value) {
+            if(!validator.isStrongPassword(value))
+            {
+                throw new Error("pls enter a strong password"+value);
+            }
+        },
+
     },
     age: {
         type: Number,
@@ -48,6 +55,12 @@ const userSchema = new mongoose.Schema({
     photoUrl: {
         type: String,
         default: "https://images.indianexpress.com/2020/02/Danny-004.jpg",
+        validate(value){
+        if(!validator.isURL(value)){
+          throw new Error("invalid url"+ value);
+        } 
+        }
+        
     },
     about: {
         type: String,
