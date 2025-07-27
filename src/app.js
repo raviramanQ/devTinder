@@ -6,6 +6,7 @@ const {validateSignUpData} = require("./utils/validation.js")
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const {userAuth} = require("./middlewares/auth.js")
 
 app.use(express.json());
 
@@ -49,26 +50,36 @@ try{
 
     const user = await User.findOne({ emailId: emailId}).exec();
 
-    console.log(user._id);
+    console.log('------1234567',user);
 
     if(!user){
         throw new Error("invalid credentials");
         
     }
 
-    const isPasswordValid = await bcrypt.compare(password,user.password);
+    /*  NOTE: 
+            previously we have done bcrypt here
+            const isPasswordValid = await bcrypt.compare(password,user.password);  
+    */
+
+        const isPasswordValid = await user.validatePassword(password);  
+
 
     if(isPasswordValid){
       
-        // create a jwt token
+    /*  NOTE:
+            previously we have done jwt sign here but now we take in to user schema which is helper method level.
+            var token = jwt.sign({ _id_: user._id }, 'urs48#jfj', { expiresIn: '30s' });
+    */
 
-        var token = jwt.sign({ _id_: user._id }, 'urs48#jfj');
-
-
-
+        // create a jwt token  
+        const token = await user.getJWT();  
+        
         // Add the token to the cookie and send the response back to  the user
 
-        res.cookie('token',token);
+        res.cookie('token',token, {
+            expires: new Date(Date.now() + 1 * 15000)
+        });
 
 
 
@@ -84,163 +95,35 @@ try{
     
 });
 
-app.post("/profile",async (req,res)=>{
+app.post("/profile",userAuth,async (req,res)=>{
 
-    try{
+try{
 
-     const cookies = req.cookies;
+    res.send({message:'user----',user:req.user});
 
-    console.log(cookies);
-
-    const {token} = cookies;
-
-    if(!token){
-
-        throw new Error('Invalid token');
-    }    
-
-    var decoded = jwt.verify(token, 'urs48#jfj');
-
-    const { _id_ } = decoded;     
-    // find user with this userId of mongoDB
-
-    let  user_detail = await User.findById(_id_).exec();
-
-    if(!user_detail){
-        throw new Error('user not found');
-    }
-
-    res.send({message:'user----',user:user_detail})    
 }
 catch(err){
 
     res.status(400).send("ERROR---- : " + err.message);
 
 }
-})
-
-
-app.post("/user",async (req,res)=>{
-
-    // fetch user on the basis of email
-    try{
-         const user = await User.find({emailId: req.body.emailId});
-
-         res.status(200).send(user);
-
-    }catch (err) {
-        res.status(400).send("error"+ err.message);
-    }
-    
 });
 
+app.post("/sendConnectionRequest",userAuth,async (req,res)=>{
 
-app.get("/feed",async (req,res)=>{
+const user = req.user;
 
-    try{
-        const users = await User.find();
-        res.send(users);
-    }
-    catch (err) {
-        res.status(400).send("issue");
-    }
-
+res.send(user.firstName + " sent the connection request ");
 
 
 });
 
-app.post("/findOneUser",async (req,res)=>{
-
-    try{
-        const userOne = await User.findOne({emailId: req.body.emailId}).sort({age:1});
-
-        res.send(userOne);
-    }
-    catch (err) {
-        res.status(400).send("issue");
-
-    }
-});
 
 
-app.delete("/deleteUser", async(req,res)=>{
-    try{
-        const deleteUser = await User.findOneAndDelete({_id : req.body.userId});
-
-        res.send(deleteUser);
-    }
-    catch (err){
-        res.status(400).send("error");
-    }
-})
-
-app.patch("/updateUserDetail/:_id", async(req,res)=>{
-
-    const id = req.params?._id;
-    
-    const data = req.body;
-
-    try{
-
-        const ALLOWED_UPDATES  = ["_id","photoUrl","about","age","emailId","skills","gender"];
-
-        const isUpdateAllowed = Object.keys(data).every((k) => 
-            ALLOWED_UPDATES.includes(k)
-        
-        );
-
-       if(!isUpdateAllowed){
-
-           throw new Error("Update not allowed");
-       }
-       console.log(typeof data?.skills);
-  
-    console.log( data?.skills.length);
-
-       if(data?.skills.length > 5)
-       {
-        console.log('-----');
-        
-        throw new Error("limit exceeds for skills");
-
-       }
-
-// return;
-
-        const updateUser = await User.findByIdAndUpdate({_id:id},data, {
-        returnDocument:"after",
-        runValidators:true,
-
-        });
-
-        res.status(200).send("data updated successfully"+updateUser);
-    }
-    catch (err){
-        res.status(400).send("error"+err.message);
 
 
-    }
-})
-
-app.put("/updateUserDetailPut", async(req,res)=>{
-
-    const id = req.body._id;
-    
-    const data = req.body;
-
-    try{
-        const updateUser = await User.replaceOne({_id:id},data, {
-        returnDocument:"after",
-        });
-
-        res.status(200).send("data updated successfully"+updateUser);
-    }
-    catch (err){
-        res.status(400).send("error");
 
 
-    }
-})
 
 
 connectDB().then(()=>{
