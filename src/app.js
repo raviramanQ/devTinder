@@ -4,8 +4,12 @@ const app = express();
 const User = require("./models/user");
 const {validateSignUpData} = require("./utils/validation.js")
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.post("/signup",async (req,res) => {
     try{
@@ -45,7 +49,7 @@ try{
 
     const user = await User.findOne({ emailId: emailId}).exec();
 
-    console.log(user);
+    console.log(user._id);
 
     if(!user){
         throw new Error("invalid credentials");
@@ -55,6 +59,19 @@ try{
     const isPasswordValid = await bcrypt.compare(password,user.password);
 
     if(isPasswordValid){
+      
+        // create a jwt token
+
+        var token = jwt.sign({ _id_: user._id }, 'urs48#jfj');
+
+
+
+        // Add the token to the cookie and send the response back to  the user
+
+        res.cookie('token',token);
+
+
+
         res.send("Login Successfully");
     }
     else{
@@ -67,9 +84,43 @@ try{
     
 });
 
+app.post("/profile",async (req,res)=>{
+
+    try{
+
+     const cookies = req.cookies;
+
+    console.log(cookies);
+
+    const {token} = cookies;
+
+    if(!token){
+
+        throw new Error('Invalid token');
+    }    
+
+    var decoded = jwt.verify(token, 'urs48#jfj');
+
+    const { _id_ } = decoded;     
+    // find user with this userId of mongoDB
+
+    let  user_detail = await User.findById(_id_).exec();
+
+    if(!user_detail){
+        throw new Error('user not found');
+    }
+
+    res.send({message:'user----',user:user_detail})    
+}
+catch(err){
+
+    res.status(400).send("ERROR---- : " + err.message);
+
+}
+})
+
 
 app.post("/user",async (req,res)=>{
-console.log('ooo',req.body);
 
     // fetch user on the basis of email
     try{
