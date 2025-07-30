@@ -47,4 +47,6 @@ profileRouter.patch("/profile/edit",userAuth,async (req,res) => {
 
 });
 
+
+profileRouter.patch("/profile/editPassword")
 module.exports = profileRouter;
