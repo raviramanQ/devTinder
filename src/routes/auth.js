@@ -51,7 +51,7 @@ authRouter.post("/login",async (req,res) =>{
                 const isPasswordValid = await bcrypt.compare(password,user.password);  
         */
     
-            const isPasswordValid = await user.validatePassword(password);  
+        const isPasswordValid = await user.validatePassword(password);  
     
     
         if(isPasswordValid){
@@ -70,9 +70,8 @@ authRouter.post("/login",async (req,res) =>{
                 expires: new Date(Date.now() + 133 * 55000)
             });
     
+            res.send(user);
     
-    
-            res.send("Login Successfully");
         }
         else{
             throw new Error("invalid credentials");
