@@ -4,7 +4,7 @@ const {userAuth} = require("../middlewares/auth.js");
 const {validateEditProfileData} = require("../utils/validation.js");
 
 
-profileRouter.post("/profile/view",userAuth,async (req,res)=>{
+profileRouter.get("/profile/view",userAuth,async (req,res)=>{
 
     try{
     
