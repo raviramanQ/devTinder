@@ -14,7 +14,7 @@ userRouter.get("/user/request/received",userAuth, async (req,res) => {
         const allRequestsReceived = await ConnectionRequest.find({
             toUserId : req.user._id,
             status : "interested"
-        }).populate("fromUserId", ["firstName","lastName","age","gender","about","skills"]);
+        }).populate("fromUserId", ["firstName","lastName","age","gender","about","skills","photoUrl"]);
 
         res.json({
             message:"data fetch successfuly",
@@ -42,8 +42,8 @@ userRouter.get("/user/connections",userAuth, async (req,res) =>{
                 {toUserId : req.user._id , status : "accepted"}
             ]
 
-        }).populate("fromUserId", ["firstName","lastName","age","gender","about","skills"]).
-        populate("toUserId", ["firstName","lastName","age","gender","about","skills"]);;
+        }).populate("fromUserId", ["firstName","lastName","age","gender","about","skills","photoUrl"]).
+        populate("toUserId", ["firstName","lastName","age","gender","about","skills","photoUrl"]);
 
         const data = allConnections.map((row) => {
             if(row.fromUserId._id.toString() === req.user._id.toString()){
