@@ -4,7 +4,7 @@ const {userAuth} = require("../middlewares/auth.js");
 const ConnectionRequest = require("../models/connectionRequest.js");
 const User = require("../models/user.js")
 
-const USER_SAFE_DATA = "firsrName lastName photoUrl age gender about skills";
+const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 
 // Get all the pending request for the loggedIn user
 userRouter.get("/user/request/received",userAuth, async (req,res) => {
@@ -76,7 +76,7 @@ userRouter.get("/feed",userAuth, async(req,res) =>{
 
         const hideUsersFromFeed = new Set();
 
-        connectionRequests.foreach((conn)=>{
+        connectionRequests.forEach((conn)=>{
             hideUsersFromFeed.add(conn.fromUserId.toString());
             hideUsersFromFeed.add(conn.toUserId.toString());
         });
