@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema({
         validate:{
 
             validator: function(v){
-                const arr = ['male','female','others'];
+                const arr = ['male','female','other'];
               if(! arr.includes(v))
               {
                  throw new Error("Gender data is not valid");
@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl: {
         type: String,
-        default: "https://images.indianexpress.com/2020/02/Danny-004.jpg",
+        default: "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
         validate(value){
         if(!validator.isURL(value)){
           throw new Error("invalid url"+ value);
