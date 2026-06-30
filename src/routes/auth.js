@@ -51,7 +51,8 @@ authRouter.post("/signup",async (req,res) => {
 
     // Save the new user to the database
     const saveUser = await user.save();
-
+console.log('Custom schema methods:', Object.keys(saveUser.schema.methods));
+console.log('All methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(saveUser)));
     // Generate JWT token for the newly created user
     const token = await saveUser.getJWT();  
             
@@ -89,8 +90,11 @@ authRouter.post("/login",async (req,res) =>{
     
         // Find user with the provided email in the database
         const user = await User.findOne({ emailId: emailId}).exec();
+
+        console.log('--->>>>>>>>',user);
+
     
-        console.log('------1234567',user); // Debug log to track user retrieval
+        // console.log('------1234567',user); // Debug log to track user retrieval
     
         if(!user){
             // If no user found with that email, throw error
